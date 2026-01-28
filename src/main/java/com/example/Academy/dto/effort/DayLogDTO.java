@@ -5,9 +5,10 @@ import java.time.LocalDate;
 public class DayLogDTO {
     private LocalDate date;
     private boolean isHoliday;
-    private EffortDetailDTO trainer;
+    private EffortDetailDTO technicalTrainer;
     private EffortDetailDTO mentor;
     private EffortDetailDTO buddyMentor;
+    private EffortDetailDTO behavioralTrainer;
 
     public DayLogDTO() {
     }
@@ -28,12 +29,12 @@ public class DayLogDTO {
         isHoliday = holiday;
     }
 
-    public EffortDetailDTO getTrainer() {
-        return trainer;
+    public EffortDetailDTO getTechnicalTrainer() {
+        return technicalTrainer;
     }
 
-    public void setTrainer(EffortDetailDTO trainer) {
-        this.trainer = trainer;
+    public void setTechnicalTrainer(EffortDetailDTO technicalTrainer) {
+        this.technicalTrainer = technicalTrainer;
     }
 
     public EffortDetailDTO getMentor() {
@@ -50,5 +51,13 @@ public class DayLogDTO {
 
     public void setBuddyMentor(EffortDetailDTO buddyMentor) {
         this.buddyMentor = buddyMentor;
+    }
+
+    public EffortDetailDTO getBehavioralTrainer() {
+        return behavioralTrainer;
+    }
+
+    public void setBehavioralTrainer(EffortDetailDTO behavioralTrainer) {
+        this.behavioralTrainer = behavioralTrainer;
     }
 }

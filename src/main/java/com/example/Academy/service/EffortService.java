@@ -65,7 +65,7 @@ public class EffortService {
         StakeholderEffort savedEffort = effortRepository.save(effort);
 
         // Update weekly summary
-        updateWeeklySummary(cohort, effort.getEffortDate());
+        updateWeeklySummary(cohort, effort.getEffortDate(), updatedBy.getName());
 
         // Send email notification
         emailService.sendDailyEffortNotification(savedEffort);
@@ -97,18 +97,40 @@ public class EffortService {
         effortRepository.deleteById(id);
 
         // Update weekly summary after deletion
-        updateWeeklySummary(effort.getCohort(), effort.getEffortDate());
+        updateWeeklySummary(effort.getCohort(),
+                effort.getEffortDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
+                "System (After Deletion)");
     }
 
-    private void updateWeeklySummary(Cohort cohort, LocalDate effortDate) {
-        // Find Monday of the week containing the effort date
-        LocalDate weekStart = effortDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    public void updateWeeklySummary(Cohort cohort, LocalDate weekStart, String submittedByName) {
         LocalDate weekEnd = weekStart.plusDays(6);
 
-        // Calculate total hours for the week
+        // Calculate total hours
         Double totalHoursDouble = effortRepository.sumEffortHoursByCohortAndDateRange(
                 cohort.getId(), weekStart, weekEnd);
         BigDecimal totalHours = totalHoursDouble != null ? BigDecimal.valueOf(totalHoursDouble) : BigDecimal.ZERO;
+
+        // Calculate individual role hours
+        Double techHours = effortRepository.sumEffortHoursByCohortRoleAndDateRange(cohort.getId(),
+                StakeholderEffort.Role.TRAINER, weekStart, weekEnd);
+        Double bhHours = effortRepository.sumEffortHoursByCohortRoleAndDateRange(cohort.getId(),
+                StakeholderEffort.Role.BH_TRAINER, weekStart, weekEnd);
+        Double mentorHours = effortRepository.sumEffortHoursByCohortRoleAndDateRange(cohort.getId(),
+                StakeholderEffort.Role.MENTOR, weekStart, weekEnd);
+        Double buddyHours = effortRepository.sumEffortHoursByCohortRoleAndDateRange(cohort.getId(),
+                StakeholderEffort.Role.BUDDY_MENTOR, weekStart, weekEnd);
+
+        updateWeeklySummaryWithTotals(cohort, weekStart, submittedByName, totalHours,
+                BigDecimal.valueOf(techHours != null ? techHours : 0),
+                BigDecimal.valueOf(bhHours != null ? bhHours : 0),
+                BigDecimal.valueOf(mentorHours != null ? mentorHours : 0),
+                BigDecimal.valueOf(buddyHours != null ? buddyHours : 0));
+    }
+
+    private void updateWeeklySummaryWithTotals(Cohort cohort, LocalDate weekStart, String submittedByName,
+            BigDecimal totalHours, BigDecimal techHours, BigDecimal bhHours, BigDecimal mentorHours,
+            BigDecimal buddyHours) {
+        LocalDate weekEnd = weekStart.plusDays(6);
 
         // Find or create weekly summary
         Optional<WeeklySummary> existingSummary = weeklySummaryRepository
@@ -121,11 +143,23 @@ public class EffortService {
             summary.setSummaryDate(LocalDateTime.now());
         } else {
             summary = new WeeklySummary(cohort, weekStart, weekEnd, totalHours);
+            summary.setCreatedAt(LocalDateTime.now());
+            summary.setSummaryDate(LocalDateTime.now());
         }
+
+        // Set individual hours
+        summary.setTechnicalTrainerHours(techHours);
+        summary.setBehavioralTrainerHours(bhHours);
+        summary.setMentorHours(mentorHours);
+        summary.setBuddyMentorHours(buddyHours);
+
+        // Set submission metadata
+        summary.setSubmittedBy(submittedByName);
+        summary.setSubmittedAt(LocalDateTime.now());
 
         WeeklySummary savedSummary = weeklySummaryRepository.save(summary);
 
-        // Send weekly summary email if it's Friday
+        // Email Notification on Fridays
         if (LocalDate.now().getDayOfWeek().name().equals("FRIDAY")) {
             emailService.sendWeeklySummaryNotification(savedSummary);
         }
@@ -160,10 +194,10 @@ public class EffortService {
                     continue;
 
                 // Trainer Log
-                if (dayLog.getTrainer() != null && dayLog.getTrainer().getHours() != null
-                        && dayLog.getTrainer().getHours().compareTo(BigDecimal.ZERO) > 0) {
+                if (dayLog.getTechnicalTrainer() != null && dayLog.getTechnicalTrainer().getHours() != null
+                        && dayLog.getTechnicalTrainer().getHours().compareTo(BigDecimal.ZERO) > 0) {
                     saveDayEffort(cohort, cohort.getPrimaryTrainer(), StakeholderEffort.Role.TRAINER,
-                            dayLog.getDate(), dayLog.getTrainer(), submittedBy);
+                            dayLog.getDate(), dayLog.getTechnicalTrainer(), submittedBy);
                 }
 
                 // Mentor Log
@@ -179,16 +213,49 @@ public class EffortService {
                     saveDayEffort(cohort, cohort.getBuddyMentor(), StakeholderEffort.Role.BUDDY_MENTOR,
                             dayLog.getDate(), dayLog.getBuddyMentor(), submittedBy);
                 }
+
+                // Behavioral Trainer Log
+                if (dayLog.getBehavioralTrainer() != null && dayLog.getBehavioralTrainer().getHours() != null
+                        && dayLog.getBehavioralTrainer().getHours().compareTo(BigDecimal.ZERO) > 0) {
+                    saveDayEffort(cohort, cohort.getBehavioralTrainer(), StakeholderEffort.Role.BH_TRAINER,
+                            dayLog.getDate(), dayLog.getBehavioralTrainer(), submittedBy);
+                }
             }
         }
 
-        updateWeeklySummary(cohort, dto.getWeekStartDate());
+        // Calculate totals from DTO for immediate update
+        BigDecimal totalH = BigDecimal.ZERO;
+        BigDecimal techH = BigDecimal.ZERO;
+        BigDecimal bhH = BigDecimal.ZERO;
+        BigDecimal mentorH = BigDecimal.ZERO;
+        BigDecimal buddyH = BigDecimal.ZERO;
+
+        if (dto.getDayLogs() != null) {
+            for (DayLogDTO log : dto.getDayLogs()) {
+                if (log.isHoliday())
+                    continue;
+                if (log.getTechnicalTrainer() != null && log.getTechnicalTrainer().getHours() != null)
+                    techH = techH.add(log.getTechnicalTrainer().getHours());
+                if (log.getBehavioralTrainer() != null && log.getBehavioralTrainer().getHours() != null)
+                    bhH = bhH.add(log.getBehavioralTrainer().getHours());
+                if (log.getMentor() != null && log.getMentor().getHours() != null)
+                    mentorH = mentorH.add(log.getMentor().getHours());
+                if (log.getBuddyMentor() != null && log.getBuddyMentor().getHours() != null)
+                    buddyH = buddyH.add(log.getBuddyMentor().getHours());
+            }
+        }
+        totalH = techH.add(bhH).add(mentorH).add(buddyH);
+
+        updateWeeklySummaryWithTotals(cohort, dto.getWeekStartDate(), submittedBy.getName(), totalH, techH, bhH,
+                mentorH, buddyH);
     }
 
     private void saveDayEffort(Cohort cohort, User stakeholder, StakeholderEffort.Role role,
             LocalDate date, EffortDetailDTO detail, User submittedBy) {
-        if (stakeholder == null)
-            return;
+        // Work Policy: Max 9 hours (10 hours total including 1 hour break)
+        if (detail.getHours() != null && detail.getHours().compareTo(BigDecimal.valueOf(9)) > 0) {
+            throw new RuntimeException("Daily effort hours for " + role + " cannot exceed 9 hours.");
+        }
 
         StakeholderEffort effort = new StakeholderEffort();
         effort.setCohort(cohort);

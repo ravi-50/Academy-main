@@ -25,6 +25,10 @@ export interface Cohort {
     id: number;
     name: string;
   };
+  behavioralTrainer?: {
+    id: number;
+    name: string;
+  };
   primaryMentor?: User;
   buddyMentor?: User;
   createdAt: string;

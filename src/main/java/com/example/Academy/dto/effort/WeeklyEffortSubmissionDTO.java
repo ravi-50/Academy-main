@@ -9,8 +9,17 @@ public class WeeklyEffortSubmissionDTO {
     private LocalDate weekEndDate;
     private List<DayLogDTO> dayLogs;
     private String location;
+    private Long coachId;
 
     public WeeklyEffortSubmissionDTO() {
+    }
+
+    public Long getCoachId() {
+        return coachId;
+    }
+
+    public void setCoachId(Long coachId) {
+        this.coachId = coachId;
     }
 
     public Long getCohortId() {

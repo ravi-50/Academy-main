@@ -18,7 +18,7 @@ public class StakeholderEffort {
     private Cohort cohort;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trainer_mentor_id", nullable = false)
+    @JoinColumn(name = "trainer_mentor_id", nullable = true)
     private User trainerMentor;
 
     @Enumerated(EnumType.STRING)
@@ -63,11 +63,12 @@ public class StakeholderEffort {
     }
 
     // Constructors
-    public StakeholderEffort() {}
+    public StakeholderEffort() {
+    }
 
     public StakeholderEffort(Cohort cohort, User trainerMentor, Role role, Mode mode,
-                           String areaOfWork, BigDecimal effortHours, LocalDate effortDate,
-                           String month, User updatedBy) {
+            String areaOfWork, BigDecimal effortHours, LocalDate effortDate,
+            String month, User updatedBy) {
         this.cohort = cohort;
         this.trainerMentor = trainerMentor;
         this.role = role;
@@ -80,42 +81,107 @@ public class StakeholderEffort {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Cohort getCohort() { return cohort; }
-    public void setCohort(Cohort cohort) { this.cohort = cohort; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public User getTrainerMentor() { return trainerMentor; }
-    public void setTrainerMentor(User trainerMentor) { this.trainerMentor = trainerMentor; }
+    public Cohort getCohort() {
+        return cohort;
+    }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public void setCohort(Cohort cohort) {
+        this.cohort = cohort;
+    }
 
-    public Mode getMode() { return mode; }
-    public void setMode(Mode mode) { this.mode = mode; }
+    public User getTrainerMentor() {
+        return trainerMentor;
+    }
 
-    public String getReasonVirtual() { return reasonVirtual; }
-    public void setReasonVirtual(String reasonVirtual) { this.reasonVirtual = reasonVirtual; }
+    public void setTrainerMentor(User trainerMentor) {
+        this.trainerMentor = trainerMentor;
+    }
 
-    public String getAreaOfWork() { return areaOfWork; }
-    public void setAreaOfWork(String areaOfWork) { this.areaOfWork = areaOfWork; }
+    public Role getRole() {
+        return role;
+    }
 
-    public BigDecimal getEffortHours() { return effortHours; }
-    public void setEffortHours(BigDecimal effortHours) { this.effortHours = effortHours; }
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
-    public LocalDate getEffortDate() { return effortDate; }
-    public void setEffortDate(LocalDate effortDate) { this.effortDate = effortDate; }
+    public Mode getMode() {
+        return mode;
+    }
 
-    public String getMonth() { return month; }
-    public void setMonth(String month) { this.month = month; }
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
 
-    public User getUpdatedBy() { return updatedBy; }
-    public void setUpdatedBy(User updatedBy) { this.updatedBy = updatedBy; }
+    public String getReasonVirtual() {
+        return reasonVirtual;
+    }
 
-    public LocalDateTime getUpdatedDate() { return updatedDate; }
-    public void setUpdatedDate(LocalDateTime updatedDate) { this.updatedDate = updatedDate; }
+    public void setReasonVirtual(String reasonVirtual) {
+        this.reasonVirtual = reasonVirtual;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getAreaOfWork() {
+        return areaOfWork;
+    }
+
+    public void setAreaOfWork(String areaOfWork) {
+        this.areaOfWork = areaOfWork;
+    }
+
+    public BigDecimal getEffortHours() {
+        return effortHours;
+    }
+
+    public void setEffortHours(BigDecimal effortHours) {
+        this.effortHours = effortHours;
+    }
+
+    public LocalDate getEffortDate() {
+        return effortDate;
+    }
+
+    public void setEffortDate(LocalDate effortDate) {
+        this.effortDate = effortDate;
+    }
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public User getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(User updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

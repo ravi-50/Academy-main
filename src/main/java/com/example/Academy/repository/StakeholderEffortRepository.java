@@ -20,6 +20,12 @@ public interface StakeholderEffortRepository extends JpaRepository<StakeholderEf
 
     @Query("SELECT SUM(se.effortHours) FROM StakeholderEffort se WHERE se.cohort.id = :cohortId AND se.effortDate BETWEEN :startDate AND :endDate")
     Double sumEffortHoursByCohortAndDateRange(@Param("cohortId") Long cohortId,
-                                             @Param("startDate") LocalDate startDate,
-                                             @Param("endDate") LocalDate endDate);
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT SUM(se.effortHours) FROM StakeholderEffort se WHERE se.cohort.id = :cohortId AND se.role = :role AND se.effortDate BETWEEN :startDate AND :endDate")
+    Double sumEffortHoursByCohortRoleAndDateRange(@Param("cohortId") Long cohortId,
+            @Param("role") StakeholderEffort.Role role,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

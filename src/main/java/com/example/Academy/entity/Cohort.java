@@ -41,6 +41,10 @@ public class Cohort {
     @JoinColumn(name = "buddy_mentor_id")
     private User buddyMentor;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "behavioral_trainer_id")
+    private User behavioralTrainer;
+
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
@@ -54,17 +58,17 @@ public class Cohort {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coach_id")
     private User coach;
 
-
     // Constructors
-    public Cohort() {}
+    public Cohort() {
+    }
 
     public Cohort(String code, String bu, String skill, Integer activeGencCount, String trainingLocation,
-                  LocalDate startDate, LocalDate endDate, User coach) {
+            LocalDate startDate, LocalDate endDate, User coach) {
         this.code = code;
         this.bu = bu;
         this.skill = skill;
@@ -76,45 +80,123 @@ public class Cohort {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getBu() { return bu; }
-    public void setBu(String bu) { this.bu = bu; }
+    public String getCode() {
+        return code;
+    }
 
-    public String getSkill() { return skill; }
-    public void setSkill(String skill) { this.skill = skill; }
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-    public Integer getActiveGencCount() { return activeGencCount; }
-    public void setActiveGencCount(Integer activeGencCount) { this.activeGencCount = activeGencCount; }
+    public String getBu() {
+        return bu;
+    }
 
-    public String getTrainingLocation() { return trainingLocation; }
-    public void setTrainingLocation(String trainingLocation) { this.trainingLocation = trainingLocation; }
+    public void setBu(String bu) {
+        this.bu = bu;
+    }
 
-    public User getPrimaryTrainer() { return primaryTrainer; }
-    public void setPrimaryTrainer(User primaryTrainer) { this.primaryTrainer = primaryTrainer; }
+    public String getSkill() {
+        return skill;
+    }
 
-    public User getPrimaryMentor() { return primaryMentor; }
-    public void setPrimaryMentor(User primaryMentor) { this.primaryMentor = primaryMentor; }
+    public void setSkill(String skill) {
+        this.skill = skill;
+    }
 
-    public User getBuddyMentor() { return buddyMentor; }
-    public void setBuddyMentor(User buddyMentor) { this.buddyMentor = buddyMentor; }
+    public Integer getActiveGencCount() {
+        return activeGencCount;
+    }
 
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public void setActiveGencCount(Integer activeGencCount) {
+        this.activeGencCount = activeGencCount;
+    }
 
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public String getTrainingLocation() {
+        return trainingLocation;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setTrainingLocation(String trainingLocation) {
+        this.trainingLocation = trainingLocation;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public User getPrimaryTrainer() {
+        return primaryTrainer;
+    }
 
-    public User getCoach() { return coach; }    
-    public void setCoach(User coach) { this.coach = coach; }
+    public void setPrimaryTrainer(User primaryTrainer) {
+        this.primaryTrainer = primaryTrainer;
+    }
+
+    public User getPrimaryMentor() {
+        return primaryMentor;
+    }
+
+    public void setPrimaryMentor(User primaryMentor) {
+        this.primaryMentor = primaryMentor;
+    }
+
+    public User getBuddyMentor() {
+        return buddyMentor;
+    }
+
+    public void setBuddyMentor(User buddyMentor) {
+        this.buddyMentor = buddyMentor;
+    }
+
+    public User getBehavioralTrainer() {
+        return behavioralTrainer;
+    }
+
+    public void setBehavioralTrainer(User behavioralTrainer) {
+        this.behavioralTrainer = behavioralTrainer;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public User getCoach() {
+        return coach;
+    }
+
+    public void setCoach(User coach) {
+        this.coach = coach;
+    }
 }

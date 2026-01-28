@@ -33,6 +33,12 @@ export interface WeeklySummary {
   weekEndDate: string;
   totalHours: number;
   summaryDate: string;
+  technicalTrainerHours: number;
+  behavioralTrainerHours: number;
+  mentorHours: number;
+  buddyMentorHours: number;
+  submittedBy?: string;
+  submittedAt?: string;
 }
 
 export interface EffortDetail {
@@ -43,16 +49,23 @@ export interface EffortDetail {
 export interface DayLog {
   date: string;
   isHoliday: boolean;
-  trainer: EffortDetail;
+  technicalTrainer: EffortDetail;
+  behavioralTrainer: EffortDetail;
   mentor: EffortDetail;
   buddyMentor: EffortDetail;
 }
 
 export interface WeeklyEffortSubmission {
   cohortId: number;
+  coachId: number;
+  location: string;
   weekStartDate: string;
   weekEndDate: string;
+  holidays: string[];
   dayLogs: DayLog[];
+  submittedBy?: string;
+  submittedAt?: string;
+  status: 'PENDING' | 'COMPLETED';
 }
 
 export const effortApi = {

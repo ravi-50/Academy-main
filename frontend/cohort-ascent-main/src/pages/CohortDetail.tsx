@@ -19,13 +19,13 @@ import {
   Edit2,
   Trash2,
 } from 'lucide-react';
-import { useCohort } from '@/hooks/useCohortsBackend';
+import { useCohorts, useCohort } from '@/hooks/useCohortsBackend';
+import { useSubmitWeeklyEffort, useWeeklySummaries, useEffortsByCohortAndRange, useEffortsByCohort } from '@/hooks/useEffortsBackend';
 import { Cohort } from '@/integrations/backend/cohortApi';
 import { useCohortStore } from '@/stores/cohortStore';
 import { useTrainers, useCreateTrainer, useAssignTrainer, useUpdateTrainer, useDeleteTrainer, useUnassignTrainer, Trainer } from '@/hooks/useTrainers';
 import { useMentors, useCreateMentor, useAssignMentor, useUpdateMentor, useDeleteMentor, useUnassignMentor, Mentor } from '@/hooks/useMentors';
 import { useCandidates, useCreateCandidate, useUpdateCandidate, useDeleteCandidate, useBulkCreateCandidates, Candidate } from '@/hooks/useCandidates';
-import { useDailyEfforts } from '@/hooks/useDailyEfforts';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientButton } from '@/components/ui/GradientButton';
 import { ActionMenu } from '@/components/ui/ActionMenu';
@@ -880,10 +880,10 @@ interface EffortsTabProps {
 
 const EffortsTab = ({ cohortId }: EffortsTabProps) => {
   const navigate = useNavigate();
-  const { data: efforts = [], isLoading } = useDailyEfforts(cohortId);
+  const { data: efforts = [], isLoading } = useEffortsByCohort(parseInt(cohortId));
 
   const groupedByDate = efforts.reduce((acc, effort) => {
-    const date = effort.date;
+    const date = effort.effortDate;
     if (!acc[date]) acc[date] = [];
     acc[date].push(effort);
     return acc;
@@ -930,15 +930,15 @@ const EffortsTab = ({ cohortId }: EffortsTabProps) => {
                           <Calendar className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">{effort.stakeholder_name}</p>
+                          <p className="font-medium text-foreground">{effort.trainerMentor?.name || 'Unassigned'}</p>
                           <p className="text-sm text-muted-foreground">
-                            {effort.stakeholder_type} • {effort.area_of_work}
+                            {effort.role} • {effort.areaOfWork}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-foreground">{effort.effort_hours} hrs</p>
-                        <p className="text-sm text-muted-foreground capitalize">{effort.mode_of_training}</p>
+                        <p className="font-semibold text-foreground">{effort.effortHours} hrs</p>
+                        <p className="text-sm text-muted-foreground capitalize">{effort.mode}</p>
                       </div>
                     </div>
                   ))}
@@ -973,10 +973,10 @@ interface ReportsTabProps {
 }
 
 const ReportsTab = ({ cohortId }: ReportsTabProps) => {
-  const { data: efforts = [] } = useDailyEfforts(cohortId);
+  const { data: efforts = [] } = useEffortsByCohort(parseInt(cohortId));
 
-  const totalHours = efforts.reduce((sum, e) => sum + Number(e.effort_hours), 0);
-  const uniqueDays = new Set(efforts.map((e) => e.date)).size;
+  const totalHours = efforts.reduce((sum, e) => sum + Number(e.effortHours), 0);
+  const uniqueDays = new Set(efforts.map((e) => e.effortDate)).size;
 
   const handleGenerateReport = () => {
     // Generate a simple report
@@ -990,12 +990,12 @@ const ReportsTab = ({ cohortId }: ReportsTabProps) => {
       ['Detailed Entries'],
       ['Date', 'Stakeholder', 'Type', 'Area of Work', 'Hours', 'Mode'],
       ...efforts.map((e) => [
-        e.date,
-        e.stakeholder_name,
-        e.stakeholder_type,
-        e.area_of_work,
-        e.effort_hours.toString(),
-        e.mode_of_training,
+        e.effortDate,
+        e.trainerMentor?.name || 'Unassigned',
+        e.role,
+        e.areaOfWork,
+        e.effortHours.toString(),
+        e.mode,
       ]),
     ]
       .map((row) => row.join(','))
